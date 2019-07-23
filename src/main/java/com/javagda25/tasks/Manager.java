@@ -13,10 +13,11 @@ import java.util.List;
 
 @Data
 @ToString
-public class Tasks {
-    Gson g = new Gson();
-    ScannerContent scannerContent = new ScannerContent();
-    private final HttpClient client;
+public class Manager {
+    private final Gson g = new Gson();
+    private final HttpClient client = HttpClient.newBuilder().build();
+    private ScannerContent scannerContent = new ScannerContent();
+    private HttpRequest request;
     // klasa, która potrafi wykonać zapytania HTTP -> te same komendy jakie są w PostMan (get, put, delete, itp.)
     // musi być Client aby stworzyć Request
 
@@ -24,23 +25,22 @@ public class Tasks {
     // client wywołuje request -> można na nim wykonać metodę SEND, aby w wnyniku otrzymać odpowiedź - zawartość strony
 
 
-    public Tasks() {
-        client = HttpClient
-                .newBuilder()
-                .build();
-    }
+//    public Manager() {
+//        client = HttpClient
+//                .newBuilder()
+//                .build();
+//    }
 
     // po wywołaniu metody 'build' obiekt kończy budowanie
 
-    public List<Task> methodGet() {
-        List<Task> objects;
-
+    public List methodGet(String uri) {
         // tym należy manipulować
         // dla komendy GET chcemy otrzymywać listę
-        HttpRequest request = HttpRequest
-                .newBuilder(URI.create("http://192.168.110.34:8080/task"))
+        request = HttpRequest
+                .newBuilder(URI.create(uri))
                 .GET()
                 .build();
+        HttpResponse<String> response = null;
 
         try {
             // wysłanie przez klienta zapytania (request)
@@ -52,49 +52,34 @@ public class Tasks {
             //                                      został napisany w taki sposób by wyjście przepisać w postaci string'a
             //                                      i zwrócić go w body obiektu HttpResponse.
             // odpowiedzią ma być String
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             // zmiana tekst -> obiekty
             // unmarshaller
-            objects = g.fromJson(response.body(), List.class);
-//            Boolean objects = g.fromJson(response.body(), Boolean.class);
 
-//            System.out.println(objects);
-            objects.forEach(System.out::println);
-
-            return objects;
-
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            return null;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return null;
         }
-
+        return g.fromJson(response.body(), List.class);
     }
 
-    public Boolean methodDelete() {
+    public Boolean methodDelete(String uri) {
         // Zapytanie o usunięcie, na końcu zapytania mamy identyfikator elementu usuwanego
         // dla delete chcemy otrzymywać boolean -> true, gdy się uda usunąć, false, gdy nie uda
-        Boolean object = false;
+        HttpResponse<String> response = null;
         int numberToDelete = scannerContent.writeNumberToDelete();
-        HttpRequest request = HttpRequest
-                .newBuilder(URI.create("http://192.168.110.34:8080/task/" + numberToDelete))
+        request = HttpRequest
+                .newBuilder(URI.create(uri + "/" + numberToDelete))
                 .DELETE()
                 .build();
 
         try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            object = g.fromJson(response.body(), Boolean.class);
-            System.out.println(object);
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-        return object;
+        return g.fromJson(response.body(), Boolean.class);
     }
 
 }

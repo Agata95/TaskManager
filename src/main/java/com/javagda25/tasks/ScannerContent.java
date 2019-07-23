@@ -6,8 +6,7 @@ public class ScannerContent {
     Scanner scanner = new Scanner(System.in);
 
     public String choiceFromUser() {
-        System.out.println("Welcome in the application Task Manager! :) \n" +
-                "What do you do now? (GET, PUT, POST, DELETE) \n" +
+        System.out.println("What do you do now? (GET, PUT, POST, DELETE) \n" +
                 "If you want leave this application, write QUIT.");
         String line = scanner.nextLine();
         return line;

@@ -1,32 +1,26 @@
 package com.javagda25.tasks;
 
-import com.google.gson.Gson;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.LocalDateTime;
-
 public class Main {
     // operacje CRUD (Create Read Update Delete)
     public static void main(String[] args) {
         ScannerContent scannerContent = new ScannerContent();
-        Tasks tasks = new Tasks();
-        String line = scannerContent.choiceFromUser();
+        Manager manager = new Manager();
+        String uri = "http://194.181.116.187:16666/task";
+        String line;
 
+        System.out.println("Welcome in the application Task Manager! :)");
         do {
+            line = scannerContent.choiceFromUser();
             switch (line) {
                 case "GET":
-                    tasks.methodGet();
+                    manager.methodGet(uri).forEach(System.out::println);
                     break;
                 case "PUT":
                     break;
                 case "POST":
                     break;
                 case "DELETE":
-                    tasks.methodDelete();
+                    manager.methodDelete(uri);
                     break;
                 default:
                     System.out.println("WRONG. TRY AGAIN.");
