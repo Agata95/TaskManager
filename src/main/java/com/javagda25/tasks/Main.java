@@ -1,5 +1,7 @@
 package com.javagda25.tasks;
 
+import java.util.Optional;
+
 public class Main {
     // operacje CRUD (Create Read Update Delete)
     public static void main(String[] args) {
@@ -19,7 +21,11 @@ public class Main {
                     manager.methodPut(uri, scannerLoader.askNewTask());
                     break;
                 case "POST":
-//                    manager.methodPost(uri,);
+                    Optional<Task> taskToUpdateOptional = manager.getById(uri,scannerLoader.askIDToGet());
+                    if (taskToUpdateOptional.isPresent()) {
+                        Task taskToEdit = taskToUpdateOptional.get();
+                        manager.methodPost(uri, scannerLoader.taskToUpdate(taskToEdit));
+                    }
                     break;
                 case "DELETE":
                     manager.methodDelete(uri);

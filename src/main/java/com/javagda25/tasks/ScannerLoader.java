@@ -12,12 +12,6 @@ public class ScannerLoader {
         return line;
     }
 
-    public int writeNumberToDelete() {
-        System.out.println("Which number of index you want to delete?");
-        int line = scanner.nextInt();
-        return line;
-    }
-
     public Task askNewTask() {
         Task newTask = new Task();
         System.out.println("Task NAME is:");
@@ -27,6 +21,16 @@ public class ScannerLoader {
         askAboutIsDone(newTask);
 
         return newTask;
+    }
+
+    public Task taskToUpdate(Task taskToEdit) {
+        System.out.println("New task NAME is:");
+        String name = scanner.nextLine();
+        taskToEdit.setName(name);
+
+        askAboutIsDone(taskToEdit);
+
+        return taskToEdit;
     }
 
     private void askAboutIsDone(Task newTask) {
@@ -45,5 +49,26 @@ public class ScannerLoader {
                 isDone = false;
             }
         } while (isDone = false);
+    }
+
+    public Long askId(String message) {
+        Long id = null;
+        do {
+            try {
+                System.out.println(message);
+                id = Long.parseLong(scanner.nextLine());
+            } catch (NumberFormatException nfe) {
+                System.err.println("WRONG!");
+            }
+        } while (id == null);
+        return id;
+    }
+
+    public Long askIDToGet() {
+        return askId("Task ID to update is:");
+    }
+
+    public Long askIDToDelete() {
+        return askId("Which number of index you want to delete?");
     }
 }

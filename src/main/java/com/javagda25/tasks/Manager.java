@@ -10,6 +10,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @ToString
@@ -67,7 +68,7 @@ public class Manager {
         // Zapytanie o usunięcie, na końcu zapytania mamy identyfikator elementu usuwanego
         // dla delete chcemy otrzymywać boolean -> true, gdy się uda usunąć, false, gdy nie uda
         HttpResponse<String> response = null;
-        int numberToDelete = scannerLoader.writeNumberToDelete();
+        Long numberToDelete = scannerLoader.askIDToDelete();
         request = HttpRequest
                 .newBuilder(URI.create(uri + "/" + numberToDelete))
                 .DELETE()
@@ -110,5 +111,24 @@ public class Manager {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public Optional<Task> getById(String uri, Long idToGet){
+        HttpRequest request = HttpRequest
+                .newBuilder(URI.create(uri + "/" + idToGet))
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            return Optional.ofNullable(GSON.fromJson(response.body(), Task.class));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return Optional.empty();
     }
 }
