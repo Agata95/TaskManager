@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class Task {
     private Long id;
     private String name;
-    private LocalDateTime creationTime;
+    private String creationTime;
     private boolean done;
     private String creator;
 }

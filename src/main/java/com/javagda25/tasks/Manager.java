@@ -14,9 +14,9 @@ import java.util.List;
 @Data
 @ToString
 public class Manager {
-    private final Gson g = new Gson();
-    private final HttpClient client = HttpClient.newBuilder().build();
-    private ScannerContent scannerContent = new ScannerContent();
+    private final Gson GSON = new Gson();
+    private HttpClient client = HttpClient.newBuilder().build();
+    private ScannerLoader scannerLoader = new ScannerLoader();
     private HttpRequest request;
     // klasa, która potrafi wykonać zapytania HTTP -> te same komendy jakie są w PostMan (get, put, delete, itp.)
     // musi być Client aby stworzyć Request
@@ -36,11 +36,11 @@ public class Manager {
     public List methodGet(String uri) {
         // tym należy manipulować
         // dla komendy GET chcemy otrzymywać listę
+        HttpResponse<String> response = null;
         request = HttpRequest
                 .newBuilder(URI.create(uri))
                 .GET()
                 .build();
-        HttpResponse<String> response = null;
 
         try {
             // wysłanie przez klienta zapytania (request)
@@ -60,14 +60,14 @@ public class Manager {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-        return g.fromJson(response.body(), List.class);
+        return GSON.fromJson(response.body(), List.class);
     }
 
     public Boolean methodDelete(String uri) {
         // Zapytanie o usunięcie, na końcu zapytania mamy identyfikator elementu usuwanego
         // dla delete chcemy otrzymywać boolean -> true, gdy się uda usunąć, false, gdy nie uda
         HttpResponse<String> response = null;
-        int numberToDelete = scannerContent.writeNumberToDelete();
+        int numberToDelete = scannerLoader.writeNumberToDelete();
         request = HttpRequest
                 .newBuilder(URI.create(uri + "/" + numberToDelete))
                 .DELETE()
@@ -75,11 +75,40 @@ public class Manager {
 
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
+            return GSON.fromJson(response.body(), Boolean.class);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-        return g.fromJson(response.body(), Boolean.class);
+        return false;
     }
 
+    public void methodPut(String uri, Task taskToSend) {
+        HttpResponse<String> response;
+        String jsonTaskToSend = GSON.toJson(taskToSend);
+        request = HttpRequest
+                .newBuilder(URI.create(uri))
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonTaskToSend))
+                .header("Content-Type", "application/json")
+                .build();
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void methodPost(String uri, Task taskToUpdate) {
+        HttpResponse<String> response;
+        String jsonTaskToSend = GSON.toJson(taskToUpdate);
+        request = HttpRequest
+                .newBuilder(URI.create(uri))
+                .POST(HttpRequest.BodyPublishers.ofString(jsonTaskToSend))
+                .header("Content-Type", "application/json")
+                .build();
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }
